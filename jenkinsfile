@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Validate Template') {
+            steps {
+                sh '''
+                    echo "Validating WordPress CloudFormation template..."
+                    aws cloudformation validate-template --template-body file://wordpress_single_instance.yml
+                '''
+            }
+        }
+
+        stage('Deploy WordPress Stack') {
+            steps {
+                sh '''
+                    echo "Deploying WordPress CloudFormation stack..."
+                    aws cloudformation deploy \
+                        --stack-name WordPressStack \
+                        --template-file wordpress_single_instance.yml \
+                        --region us-east-1 \
+                        --capabilities CAPABILITY_NAMED_IAM \
+                        --parameter-overrides KeyName=mykeypair
+
+                    echo "✅ WordPress stack deployed successfully!"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🎯 Pipeline completed successfully."
+        }
+        failure {
+            echo "❌ Deployment failed. Check CloudFormation logs."
+        }
+    }
+}
