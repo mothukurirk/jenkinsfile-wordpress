@@ -10,7 +10,7 @@ Description: >
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access
-    Type: AWS::EC2::KeyPair::my-key-pair
+    Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
 
   InstanceType:
@@ -99,7 +99,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       SecurityGroups: [!Ref WebServerSecurityGroup]
-      KeyName: !Ref my-key-pair
+      KeyName: !Ref KeyName
       ImageId: !FindInMap [AWSRegionArch2AMI, !Ref "AWS::Region", !FindInMap [AWSInstanceType2Arch, !Ref InstanceType, Arch]]
       UserData:
         Fn::Base64: !Sub |
