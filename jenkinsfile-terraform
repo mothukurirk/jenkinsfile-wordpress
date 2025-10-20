@@ -3,33 +3,45 @@ pipeline {
     tools {
         terraform 'Terraform'
     }
+
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-creds')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-creds')
-        AWS_DEFAULT_REGION     = 'us-east-1'
+        AWS_DEFAULT_REGION = 'us-east-1'
     }
+
     stages {
         stage('Init') {
             steps {
-                bat 'terraform init'
+                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                    bat 'terraform init'
+                }
             }
         }
+
         stage('Plan') {
             steps {
-                bat 'terraform plan'
+                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                    bat 'terraform plan'
+                }
             }
         }
+
         stage('Apply') {
             steps {
-                bat 'terraform apply -auto-approve'
+                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                    bat 'terraform apply -auto-approve'
+                }
             }
         }
+
         stage('Destroy') {
             steps {
-                bat 'terraform destroy -auto-approve'
+                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                    bat 'terraform destroy -auto-approve'
+                }
             }
         }
     }
+
     post {
         success {
             echo "✅ Terraform pipeline executed successfully!"
@@ -39,3 +51,4 @@ pipeline {
         }
     }
 }
+
