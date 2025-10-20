@@ -1,16 +1,42 @@
-provider "aws" {
-  region = "us-east-1"
-}
+pipeline {
+    agent any
+    tools {
+        terraform 'Terraform'
+    }
 
-resource "aws_s3_bucket" "test_bucket" {
-  bucket = "my-jenkins-terraform-bucket-${random_id.suffix.hex}"
-  acl    = "private"
-}
+    stages {
+        stage('Init') {
+            steps {
+                bat 'terraform init'
+            }
+        }
 
-resource "random_id" "suffix" {
-  byte_length = 4
-}
+        stage('Plan') {
+            steps {
+                bat 'terraform plan'
+            }
+        }
 
-output "bucket_name" {
-  value = aws_s3_bucket.test_bucket.bucket
+        stage('Apply') {
+            steps {
+                bat 'terraform apply -auto-approve'
+            }
+        }
+
+        stage('Destroy') {
+            steps {
+                input message: 'Do you want to destroy the Terraform resources?', ok: 'Yes, destroy'
+                bat 'terraform destroy -auto-approve'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Terraform pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Please check the logs."
+        }
+    }
 }
