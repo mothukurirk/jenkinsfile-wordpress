@@ -3,6 +3,11 @@ pipeline {
     tools {
         terraform 'Terraform'
     }
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-creds')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-creds')
+        AWS_DEFAULT_REGION     = 'us-east-1'
+    }
     stages {
         stage('Init') {
             steps {
@@ -26,11 +31,11 @@ pipeline {
         }
     }
     post {
-        failure {
-            echo "❌ Pipeline failed. Please check the logs."
-        }
         success {
             echo "✅ Terraform pipeline executed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Please check the logs."
         }
     }
 }
