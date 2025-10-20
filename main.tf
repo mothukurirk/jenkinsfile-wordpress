@@ -3,14 +3,9 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "test_bucket" {
-  bucket = "my-jenkins-terraform-bucket-${random_id.suffix.hex}"
-  acl    = "private"
+  bucket = "jenkins-terraform-demo-bucket-${random_id.rand.hex}"
 }
 
-resource "random_id" "suffix" {
+resource "random_id" "rand" {
   byte_length = 4
-}
-
-output "bucket_name" {
-  value = aws_s3_bucket.test_bucket.bucket
 }
